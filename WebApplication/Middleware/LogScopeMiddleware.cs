@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using WebApplication.TraceInfoSection;
 
 namespace WebApplication.Middleware
 {
@@ -15,10 +16,10 @@ namespace WebApplication.Middleware
             _loggerFactory = loggerFactory;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, ITraceInfoAccessor traceInfoAccessor)
         {
             var logger = _loggerFactory.CreateLogger<LogScopeMiddleware>();
-            using (logger.BeginScope(context.TraceIdentifier))
+            using (logger.BeginScope($"{traceInfoAccessor.TraceInfo?.TraceId}--{traceInfoAccessor.TraceInfo?.MachineName}"))
             {
                 await _next.Invoke(context);
             }

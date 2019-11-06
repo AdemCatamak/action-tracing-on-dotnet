@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using WebApplication.HttpInterceptors;
 using WebApplication.Middleware;
 using WebApplication.Proxies;
+using WebApplication.TraceInfoSection;
 
 namespace WebApplication
 {
@@ -25,7 +26,8 @@ namespace WebApplication
         {
             services.AddControllers();
 
-            services.AddHttpContextAccessor();
+            services.AddTraceInfoAccessor();
+            
             services.AddTransient<HttpClientTraceIdInterceptor>();
             services.AddHttpClient<ICityClient, CityHttpClient>(httpClient =>
                                                                 {

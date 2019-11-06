@@ -2,25 +2,25 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using WebApplication.TraceInfoSection;
 
 namespace WebApplication.HttpInterceptors
 {
     public class HttpClientTraceIdInterceptor : DelegatingHandler
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ITraceInfoAccessor _traceInfoAccessor;
         private readonly IOptions<HttpClientTraceIdInterceptorConfiguration> _options;
 
-        public HttpClientTraceIdInterceptor(IHttpContextAccessor httpContextAccessor, IOptions<HttpClientTraceIdInterceptorConfiguration> options = null)
+        public HttpClientTraceIdInterceptor(ITraceInfoAccessor traceInfoAccessor, IOptions<HttpClientTraceIdInterceptorConfiguration> options = null)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _traceInfoAccessor = traceInfoAccessor;
             _options = options;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            string traceId = _httpContextAccessor.HttpContext.TraceIdentifier;
+            string traceId = _traceInfoAccessor.TraceInfo?.TraceId;
 
             HttpClientTraceIdInterceptorConfiguration httpClientTraceIdInterceptorConfiguration = _options?.Value ?? new HttpClientTraceIdInterceptorConfiguration();
             if (!string.IsNullOrEmpty(traceId)

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using WebApplication.TraceInfoSection;
 
 namespace WebApplication.Middleware
 {
@@ -17,7 +18,7 @@ namespace WebApplication.Middleware
             _traceIdMiddlewareConfigurationOptions = options;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, ITraceInfoAccessor traceInfoAccessor)
         {
             TraceIdMiddlewareConfiguration traceIdMiddlewareConfiguration = _traceIdMiddlewareConfigurationOptions?.Value ?? new TraceIdMiddlewareConfiguration();
 
@@ -28,6 +29,12 @@ namespace WebApplication.Middleware
             }
 
             context.TraceIdentifier = traceId;
+            
+            traceInfoAccessor.TraceInfo = new TraceInfo()
+                                          {
+                                              TraceId = traceId,
+                                              MachineName = Environment.MachineName
+                                          };
             
             context.Response.OnStarting(() =>
                                         {
